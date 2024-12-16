@@ -90,107 +90,105 @@ public class DefaultExampleProject extends DefaultProjectCreator {
 		if (!project.getDirectory().isDirectory()) {
 			throw new FileNotFoundException("Cannot create project at " + project.getDirectory().getAbsolutePath());
 		}
-		return project;
-	}
 
-	int needleDrawableId;
-	int backgroundDrawableId;
-	int screenshotDrawableId;
+		int needleDrawableId;
+		int backgroundDrawableId;
+		int screenshotDrawableId;
 
-	if (landscapeMode) {
-		backgroundDrawableId = R.drawable.default_project_background_landscape;
-		needleDrawableId = R.drawable.default_project_needle;
-		screenshotDrawableId = R.drawable.default_project_screenshot_landscape;
-	} else {
-		backgroundDrawableId = R.drawable.default_project_background_portrait;
-		needleDrawableId = R.drawable.default_project_needle;
-		screenshotDrawableId = R.drawable.default_project_screenshot;
-	}
+		if (landscapeMode) {
+			backgroundDrawableId = R.drawable.default_project_background_landscape;
+			needleDrawableId = R.drawable.default_project_needle;
+			screenshotDrawableId = R.drawable.default_project_screenshot_landscape;
+		} else {
+			backgroundDrawableId = R.drawable.default_project_background_portrait;
+			needleDrawableId = R.drawable.default_project_needle;
+			screenshotDrawableId = R.drawable.default_project_screenshot;
+		}
 
-	BitmapFactory.Options options = new BitmapFactory.Options();
-	options.inJustDecodeBounds = true;
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inJustDecodeBounds = true;
 		BitmapFactory.decodeResource(context.getResources(), backgroundDrawableId, options);
 
-	backgroundImageScaleFactor = ImageEditing.calculateScaleFactor(
-		options.outWidth,
-		options.outHeight,
-		ScreenValues.currentScreenResolution.getWidth(),
-		ScreenValues.currentScreenResolution.getHeight());
+		backgroundImageScaleFactor = ImageEditing.calculateScaleFactor(
+						options.outWidth,
+						options.outHeight,
+						ScreenValues.currentScreenResolution.getWidth(),
+						ScreenValues.currentScreenResolution.getHeight());
 
-	Scene scene = project.getDefaultScene();
+		Scene scene = project.getDefaultScene();
 
-	File imageDir = new File(scene.getDirectory(), IMAGE_DIRECTORY_NAME);
+		File imageDir = new File(scene.getDirectory(), IMAGE_DIRECTORY_NAME);
 
-	String imageFileName = "img" + DEFAULT_IMAGE_EXTENSION;
+		String imageFileName = "img" + DEFAULT_IMAGE_EXTENSION;
 
-	File needleFile1 = ResourceImporter.createImageFileFromResourcesInDirectory(context.getResources(),
-			needleDrawableId,
-			imageDir,
-			imageFileName,
-			backgroundImageScaleFactor);
+		File needleFile1 = ResourceImporter.createImageFileFromResourcesInDirectory(context.getResources(),
+						needleDrawableId,
+						imageDir,
+						imageFileName,
+						backgroundImageScaleFactor);
 
-	ResourceImporter.createImageFileFromResourcesInDirectory(context.getResources(),
-		screenshotDrawableId,
-		scene.getDirectory(),
-		SCREENSHOT_AUTOMATIC_FILE_NAME,
-		1);
+		ResourceImporter.createImageFileFromResourcesInDirectory(context.getResources(),
+						screenshotDrawableId,
+						scene.getDirectory(),
+						SCREENSHOT_AUTOMATIC_FILE_NAME,
+						1);
 
-	Sprite needle = new Sprite(context.getString(R.string.default_project_needle_name));
+		Sprite needle = new Sprite(context.getString(R.string.default_project_needle_name));
 
-	scene.addSprite(needle);
+		scene.addSprite(needle);
 
-	needle.getLookList()
-			.add(new LookData(context.getString(R.string.default_project_needle_name), needleFile1));
+		needle.getLookList()
+				.add(new LookData(context.getString(R.string.default_project_needle_name), needleFile1));
 
-	Script script = new StartScript();
+		Script script = new StartScript();
 
-	UserVariable variableOuterLoop = new UserVariable(context.getString(R.string.default_project_outer_loop));
-	UserVariable variableInnerLoop = new UserVariable(context.getString(R.string.default_project_inner_loop));
+		UserVariable variableOuterLoop = new UserVariable(context.getString(R.string.default_project_outer_loop));
+		UserVariable variableInnerLoop = new UserVariable(context.getString(R.string.default_project_inner_loop));
 
-	needle.addUserVariable(variableInnerLoop);
-	needle.addUserVariable(variableOuterLoop);
+		needle.addUserVariable(variableInnerLoop);
+		needle.addUserVariable(variableOuterLoop);
 
-	script.addBrick(new SetVariableBrick(new Formula(8), variableInnerLoop));
-	script.addBrick(new SetVariableBrick(new Formula(8), variableOuterLoop));
-	script.addBrick(new ZigZagStitchBrick(new Formula(2), new Formula(10)));
+		script.addBrick(new SetVariableBrick(new Formula(8), variableInnerLoop));
+		script.addBrick(new SetVariableBrick(new Formula(8), variableOuterLoop));
+		script.addBrick(new ZigZagStitchBrick(new Formula(2), new Formula(10)));
 
-	Formula repeatUntilFormulaOuterLoop = new Formula(1);
-	repeatUntilFormulaOuterLoop.setRoot(new FormulaElement(FormulaElement.ElementType.USER_VARIABLE,
-			variableOuterLoop.getName(),
-			null));
-
-	RepeatBrick outerLoopRepeat = new RepeatBrick(repeatUntilFormulaOuterLoop);
-
-	Formula repeatUntilFormulaInnerLoop = new Formula(1);
-	repeatUntilFormulaInnerLoop.setRoot(new FormulaElement(FormulaElement.ElementType.USER_VARIABLE,
-			variableInnerLoop.getName(),
+		Formula repeatUntilFormulaOuterLoop = new Formula(1);
+		repeatUntilFormulaOuterLoop.setRoot(new FormulaElement(FormulaElement.ElementType.USER_VARIABLE,
+				variableOuterLoop.getName(),
 				null));
 
-	RepeatBrick innerLoopRepeat = new RepeatBrick(repeatUntilFormulaInnerLoop);
-	innerLoopRepeat.addBrick(new MoveNStepsBrick(new Formula(100)));
+		RepeatBrick outerLoopRepeat = new RepeatBrick(repeatUntilFormulaOuterLoop);
 
-	FormulaElement innerLoopFormula = new FormulaElement(FormulaElement.ElementType.OPERATOR,
-			Operators.DIVIDE.name(), null,
-			new FormulaElement(FormulaElement.ElementType.NUMBER, String.valueOf(360), null),
-			new FormulaElement(FormulaElement.ElementType.USER_VARIABLE, variableInnerLoop.getName(),
+		Formula repeatUntilFormulaInnerLoop = new Formula(1);
+		repeatUntilFormulaInnerLoop.setRoot(new FormulaElement(FormulaElement.ElementType.USER_VARIABLE,
+				variableInnerLoop.getName(),
 					null));
 
-	innerLoopRepeat.addBrick(new TurnRightBrick(new Formula(innerLoopFormula)));
+		RepeatBrick innerLoopRepeat = new RepeatBrick(repeatUntilFormulaInnerLoop);
+		innerLoopRepeat.addBrick(new MoveNStepsBrick(new Formula(100)));
 
-	outerLoopRepeat.addBrick(innerLoopRepeat);
-	FormulaElement outerLoopFormula = new FormulaElement(FormulaElement.ElementType.OPERATOR,
-			Operators.DIVIDE.name(), null,
-			new FormulaElement(FormulaElement.ElementType.NUMBER, String.valueOf(360), null),
-			new FormulaElement(FormulaElement.ElementType.USER_VARIABLE, variableOuterLoop.getName(),
-					null));
-	outerLoopRepeat.addBrick(new TurnRightBrick(new Formula(outerLoopFormula)));
+		FormulaElement innerLoopFormula = new FormulaElement(FormulaElement.ElementType.OPERATOR,
+				Operators.DIVIDE.name(), null,
+				new FormulaElement(FormulaElement.ElementType.NUMBER, String.valueOf(360), null),
+				new FormulaElement(FormulaElement.ElementType.USER_VARIABLE, variableInnerLoop.getName(),
+						null));
 
-	script.addBrick(outerLoopRepeat);
-	needle.addScript(script);
+		innerLoopRepeat.addBrick(new TurnRightBrick(new Formula(innerLoopFormula)));
 
-	XstreamSerializer.getInstance().saveProject(project);
-	return project;
-}
+		outerLoopRepeat.addBrick(innerLoopRepeat);
+		FormulaElement outerLoopFormula = new FormulaElement(FormulaElement.ElementType.OPERATOR,
+				Operators.DIVIDE.name(), null,
+				new FormulaElement(FormulaElement.ElementType.NUMBER, String.valueOf(360), null),
+				new FormulaElement(FormulaElement.ElementType.USER_VARIABLE, variableOuterLoop.getName(),
+						null));
+		outerLoopRepeat.addBrick(new TurnRightBrick(new Formula(outerLoopFormula)));
+
+		script.addBrick(outerLoopRepeat);
+		needle.addScript(script);
+
+		XstreamSerializer.getInstance().saveProject(project);
+		return project;
+	}
 
 	private Project createFramedExampleProject(String name, Context context,
 			boolean landscapeMode) throws IOException {
